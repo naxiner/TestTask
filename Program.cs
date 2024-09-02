@@ -18,10 +18,13 @@ namespace TestTask
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+            builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));
+
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddScoped<IJwtProvider, JwtProvider>();
 
             var app = builder.Build();
 

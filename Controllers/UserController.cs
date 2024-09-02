@@ -11,10 +11,12 @@ namespace TestTask.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserRepository _userRepository;
+        private readonly IJwtProvider _jwtProvider;
 
-        public UserController(IUserRepository userRepository)
+        public UserController(IUserRepository userRepository, IJwtProvider jwtProvider)
         {
             _userRepository = userRepository;
+            _jwtProvider = jwtProvider;
         }
 
         [HttpPost("register")]
@@ -45,7 +47,23 @@ namespace TestTask.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login(UserLoginDto loginDto)
         {
-            return Ok();
+            var user = await _userRepository.GetByNameOrEmailAsync(loginDto.UsernameOrEmail);
+            
+            if (user == null)
+            {
+                return BadRequest("Username or Email already exists.");
+            }
+
+            var result = BCrypt.Net.BCrypt.Verify(loginDto.Password, user.PasswordHash);
+
+            if (result == false)
+            {
+                throw new Exception("Failed to login");
+            }
+
+            var token = _jwtProvider.GenerateToken(user);
+
+            return Ok(token);
         }
     }
 }
