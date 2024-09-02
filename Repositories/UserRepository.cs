@@ -26,6 +26,12 @@ namespace TestTask.Repositories
         {
             return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
         }
+        
+        public async Task<User> GetByNameOrEmailAsync(string nameOrEmail)
+        {
+            return await _context.Users.FirstOrDefaultAsync(
+                u => u.Username == nameOrEmail || u.Email == nameOrEmail);
+        }
 
         public async Task<bool> Add(User user)
         {
