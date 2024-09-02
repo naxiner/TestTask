@@ -20,8 +20,8 @@ namespace TestTask.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register(UserRegistrationDto userDto)
         {
-            if (_userRepository.GetByNameAsync(userDto.Username) != null || 
-                _userRepository.GetByEmailAsync(userDto.Email) != null)
+            if (await _userRepository.GetByNameAsync(userDto.Username) != null || 
+                await _userRepository.GetByEmailAsync(userDto.Email) != null)
             {
                 return BadRequest("Username or Email already exists.");
             }
