@@ -12,11 +12,17 @@ namespace TestTask.Controllers
     {
         private readonly IUserRepository _userRepository;
         private readonly IJwtProvider _jwtProvider;
+        private readonly ILogger<UserController> _logger;
 
-        public UserController(IUserRepository userRepository, IJwtProvider jwtProvider)
+
+        public UserController(
+            IUserRepository userRepository,
+            IJwtProvider jwtProvider,
+            ILogger<UserController> logger)
         {
             _userRepository = userRepository;
             _jwtProvider = jwtProvider;
+            _logger = logger;
         }
 
         [HttpPost("register")]
@@ -25,11 +31,13 @@ namespace TestTask.Controllers
             if (await _userRepository.GetByNameAsync(userDto.Username) != null || 
                 await _userRepository.GetByEmailAsync(userDto.Email) != null)
             {
+                _logger.LogError("Username or Email already exists.");
                 return BadRequest("Username or Email already exists.");
             }
 
             if (!IsPasswordComplex(userDto.Password))
             {
+                _logger.LogError("Password requirements are not met.");
                 return BadRequest("Password must be at least 8 characters long, " +
                                   "and contain an uppercase letter, a lowercase letter, " +
                                   "a digit, and a special character.");
@@ -48,6 +56,7 @@ namespace TestTask.Controllers
 
             await _userRepository.AddAsync(user);
 
+            _logger.LogInformation("User registered successfully.");
             return Ok("User registered successfully.");
         }
 
@@ -58,6 +67,7 @@ namespace TestTask.Controllers
             
             if (user == null)
             {
+                _logger.LogError("Username or Email already exists.");
                 return BadRequest("Username or Email already exists.");
             }
 
@@ -65,13 +75,15 @@ namespace TestTask.Controllers
 
             if (result == false)
             {
-                throw new Exception("Failed to login");
+                _logger.LogError("Failed to login.");
+                throw new Exception("Failed to login.");
             }
 
             var token = _jwtProvider.GenerateToken(user);
 
             HttpContext.Response.Cookies.Append("token-cookie", token);
 
+            _logger.LogInformation("User login successfully.");
             return Ok(token);
         }
 

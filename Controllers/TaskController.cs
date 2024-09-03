@@ -13,11 +13,16 @@ namespace TestTask.Controllers
     {
         private readonly IUserRepository _userRepository;
         private readonly ITaskRepository _taskRepository;
+        private readonly ILogger<TaskController> _logger;
 
-        public TaskController(IUserRepository userRepository, ITaskRepository taskRepository)
+        public TaskController(
+            IUserRepository userRepository, 
+            ITaskRepository taskRepository,
+            ILogger<TaskController> logger)
         {
             _userRepository = userRepository;
             _taskRepository = taskRepository;
+            _logger = logger;
         }
         
         private Guid GetUserIdFromToken()
@@ -28,7 +33,8 @@ namespace TestTask.Controllers
 
             if (userIdClaim == null)
             {
-                throw new Exception("User ID claim not found");
+                _logger.LogError("User ID claim not found.");
+                throw new Exception("User ID claim not found.");
             }
 
             return Guid.Parse(userIdClaim?.Value);
@@ -53,8 +59,11 @@ namespace TestTask.Controllers
 
             if (result == false)
             {
+                _logger.LogError("Failed to add task.");
                 return BadRequest("Failed to add task.");
             }
+
+            _logger.LogInformation("Task added successfully.");
             return Ok("Task added successfully.");
         }
 
@@ -66,9 +75,11 @@ namespace TestTask.Controllers
             var tasks = await _taskRepository.GetAllByUserIdAsync(userId, filter);
             if (tasks == null)
             {
+                _logger.LogWarning("No tasks found for user.");
                 return NotFound("Tasks not found.");
             }
 
+            _logger.LogInformation("Tasks retrieved successfully for user.");
             return Ok(tasks);
         }
 
@@ -80,9 +91,11 @@ namespace TestTask.Controllers
             var task = await _taskRepository.GetByIdAsync(id, userId);
             if (task == null)
             {
+                _logger.LogWarning("Task not found.");
                 return NotFound("Task not found.");
             }
 
+            _logger.LogInformation("Task retrieved successfully.");
             return Ok(task);
         }
 
@@ -94,6 +107,7 @@ namespace TestTask.Controllers
             var existingTask = await _taskRepository.GetByIdAsync(id, userId);
             if (existingTask == null)
             {
+                _logger.LogWarning("Task not found.");
                 return NotFound("Task not found.");
             }
 
@@ -108,9 +122,11 @@ namespace TestTask.Controllers
 
             if (!result)
             {
+                _logger.LogError("Failed to update task.");
                 return BadRequest("Failed to update task.");
             }
 
+            _logger.LogInformation("Task updated successfully.");
             return Ok("Task updated successfully.");
         }
 
@@ -122,6 +138,7 @@ namespace TestTask.Controllers
             var task = await _taskRepository.GetByIdAsync(id, userId);
             if (task == null)
             {
+                _logger.LogWarning("Task not found.");
                 return NotFound("Task not found.");
             }
 
@@ -129,9 +146,11 @@ namespace TestTask.Controllers
 
             if (!result)
             {
+                _logger.LogError("Failed to delete task.");
                 return BadRequest("Failed to delete task.");
             }
 
+            _logger.LogInformation("Task deleted successfully.");
             return Ok("Task deleted successfully.");
         }
     }
