@@ -28,6 +28,13 @@ namespace TestTask.Controllers
                 return BadRequest("Username or Email already exists.");
             }
 
+            if (!IsPasswordComplex(userDto.Password))
+            {
+                return BadRequest("Password must be at least 8 characters long, " +
+                                  "and contain an uppercase letter, a lowercase letter, " +
+                                  "a digit, and a special character.");
+            }
+
             var hashedPassword = BCrypt.Net.BCrypt.HashPassword(userDto.Password);
 
             var user = new User
@@ -66,6 +73,24 @@ namespace TestTask.Controllers
             HttpContext.Response.Cookies.Append("token-cookie", token);
 
             return Ok(token);
+        }
+
+        private bool IsPasswordComplex(string password)
+        {
+            // minimal length
+            if (password.Length < 8) return false;
+
+            bool hasUpperCase = false, hasLowerCase = false, hasDigit = false, hasSpecialChar = false;
+
+            foreach (var c in password)
+            {
+                if (char.IsUpper(c)) hasUpperCase = true;
+                else if (char.IsLower(c)) hasLowerCase = true;
+                else if (char.IsDigit(c)) hasDigit = true;
+                else if (!char.IsLetterOrDigit(c)) hasSpecialChar = true;
+            }
+
+            return hasUpperCase && hasLowerCase && hasDigit && hasSpecialChar;
         }
     }
 }
