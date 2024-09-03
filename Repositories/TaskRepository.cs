@@ -65,6 +65,10 @@ namespace TestTask.Repositories
                 };
             }
 
+            // Pagination
+            var skip = (filter.PageNumber - 1) * filter.PageSize;
+            query = query.Skip(skip).Take(filter.PageSize);
+
             return await query.ToListAsync();
         }
 
