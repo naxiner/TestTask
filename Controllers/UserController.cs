@@ -63,6 +63,8 @@ namespace TestTask.Controllers
 
             var token = _jwtProvider.GenerateToken(user);
 
+            HttpContext.Response.Cookies.Append("token-cookie", token);
+
             return Ok(token);
         }
     }
