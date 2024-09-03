@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using TestTask.Models;
 using TestTask.Models.DTO;
 using TestTask.Repositories;
 
 namespace TestTask.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class TaskController : ControllerBase
@@ -32,8 +34,7 @@ namespace TestTask.Controllers
             return Guid.Parse(userIdClaim?.Value);
         }
 
-        [Authorize]
-        [HttpPost("add")]
+        [HttpPost]
         public async Task<IActionResult> AddTask(TaskDto taskDto)
         {
             var userId = GetUserIdFromToken();
@@ -55,6 +56,83 @@ namespace TestTask.Controllers
                 return BadRequest("Failed to add task.");
             }
             return Ok("Task added successfully.");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetTasks([FromQuery] TaskFilter filter)
+        {
+            var userId = GetUserIdFromToken();
+
+            var tasks = await _taskRepository.GetAllByUserIdAsync(userId, filter);
+            if (tasks == null)
+            {
+                return NotFound("Tasks not found.");
+            }
+
+            return Ok(tasks);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetTask(Guid id)
+        {
+            var userId = GetUserIdFromToken();
+
+            var task = await _taskRepository.GetByIdAsync(id, userId);
+            if (task == null)
+            {
+                return NotFound("Task not found.");
+            }
+
+            return Ok(task);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateTask(Guid id, [FromBody] TaskDto updatedTaskDto)
+        {
+            var userId = GetUserIdFromToken();
+
+            var existingTask = await _taskRepository.GetByIdAsync(id, userId);
+            if (existingTask == null)
+            {
+                return NotFound("Task not found.");
+            }
+
+            existingTask.Title = updatedTaskDto.Title;
+            existingTask.Description = updatedTaskDto.Description;
+            existingTask.DueDate = updatedTaskDto.DueDate;
+            existingTask.Status = updatedTaskDto.Status;
+            existingTask.Priority = updatedTaskDto.Priority;
+            existingTask.UpdatedAt = DateTime.Now;
+
+            var result = await _taskRepository.UpdateAsync(existingTask);
+
+            if (!result)
+            {
+                return BadRequest("Failed to update task.");
+            }
+
+            return Ok("Task updated successfully.");
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteTask(Guid id)
+        {
+            var userId = GetUserIdFromToken();
+
+            var task = await _taskRepository.GetByIdAsync(id, userId);
+            if (task == null)
+            {
+                return NotFound("Task not found.");
+            }
+
+            var result = await _taskRepository.DeleteAsync(id);
+
+            if (!result)
+            {
+                return BadRequest("Failed to delete task.");
+            }
+
+            return Ok("Task deleted successfully.");
         }
     }
 }

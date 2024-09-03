@@ -18,24 +18,66 @@ namespace TestTask.Repositories
             return await _context.SaveChangesAsync() > 0;
         }
 
-        public Task<Models.Task> DeleteAsync(Models.Task task)
+        public async Task<bool> DeleteAsync(Guid taskId)
         {
-            throw new NotImplementedException();
+            var task = await _context.Tasks.FindAsync(taskId);
+            if (task == null)
+            {
+                return false;
+            }
+
+            _context.Tasks.Remove(task);
+            return await _context.SaveChangesAsync() > 0;
         }
 
-        public Task<IEnumerable<Models.Task>> GetAllByUserIdAsync(Guid userId)
+        public async Task<IEnumerable<Models.Task>> GetAllByUserIdAsync(Guid userId, TaskFilter filter)
         {
-            throw new NotImplementedException();
+            var query = _context.Tasks.AsQueryable();
+
+            query = query.Where(t => t.UserId == userId);
+
+            if (filter.Status.HasValue)
+            {
+                query = query.Where(t => t.Status == filter.Status.Value);
+            }
+
+            if (filter.DueDate.HasValue)
+            {
+                query = query.Where(t => t.DueDate.HasValue && t.DueDate.Value.Date == filter.DueDate.Value.Date);
+            }
+
+            if (filter.Priority.HasValue)
+            {
+                query = query.Where(t => t.Priority == filter.Priority.Value);
+            }
+
+            if (!string.IsNullOrEmpty(filter.SortBy))
+            {
+                query = filter.SortBy.ToLower() switch
+                {
+                    "duedate" => (filter.SortDescending ?? false)
+                        ? query.OrderByDescending(t => t.DueDate)
+                        : query.OrderBy(t => t.DueDate),
+                    "priority" => (filter.SortDescending ?? false)
+                        ? query.OrderByDescending(t => t.Priority)
+                        : query.OrderBy(t => t.Priority),
+                    _ => query
+                };
+            }
+
+            return await query.ToListAsync();
         }
 
-        public Task<Models.Task> GetByIdAsync(Guid taskId, Guid userId)
+        public async Task<Models.Task> GetByIdAsync(Guid taskId, Guid userId)
         {
-            throw new NotImplementedException();
+            return await _context.Tasks
+                .FirstOrDefaultAsync(t => t.Id == taskId && t.UserId == userId);
         }
 
-        public Task<Models.Task> UpdateAsync(Models.Task task)
+        public async Task<bool> UpdateAsync(Models.Task task)
         {
-            throw new NotImplementedException();
+            _context.Tasks.Update(task);
+            return await _context.SaveChangesAsync() > 0;
         }
     }
 }
