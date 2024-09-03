@@ -25,7 +25,11 @@ namespace TestTask.Data
                 .WithMany()
                 .HasForeignKey(t => t.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
-            
+
+            modelBuilder.Entity<Models.Task>()
+                .Property(t => t.Id)
+                .HasDefaultValueSql("NEWID()");
+
             base.OnModelCreating(modelBuilder);
         }
     }

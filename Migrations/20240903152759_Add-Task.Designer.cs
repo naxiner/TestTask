@@ -12,7 +12,7 @@ using TestTask.Data;
 namespace TestTask.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240903104307_Add-Task")]
+    [Migration("20240903152759_Add-Task")]
     partial class AddTask
     {
         /// <inheritdoc />
@@ -27,11 +27,10 @@ namespace TestTask.Migrations
 
             modelBuilder.Entity("TestTask.Models.Task", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                        .HasColumnType("uniqueidentifier")
+                        .HasDefaultValueSql("NEWID()");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
