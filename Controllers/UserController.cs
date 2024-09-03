@@ -39,7 +39,7 @@ namespace TestTask.Controllers
                 UpdatedAt = DateTime.UtcNow
             };
 
-            await _userRepository.Add(user);
+            await _userRepository.AddAsync(user);
 
             return Ok("User registered successfully.");
         }

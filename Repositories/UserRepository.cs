@@ -33,7 +33,7 @@ namespace TestTask.Repositories
                 u => u.Username == nameOrEmail || u.Email == nameOrEmail);
         }
 
-        public async Task<bool> Add(User user)
+        public async Task<bool> AddAsync(User user)
         {
             try
             {

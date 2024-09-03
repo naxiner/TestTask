@@ -8,6 +8,6 @@ namespace TestTask.Repositories
         Task<User> GetByNameAsync(string username);
         Task<User> GetByEmailAsync(string email);
         Task<User> GetByNameOrEmailAsync(string nameOrEmail);
-        Task<bool> Add(User user);
+        Task<bool> AddAsync(User user);
     }
 }
