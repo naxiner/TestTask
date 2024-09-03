@@ -11,7 +11,6 @@ namespace TestTask.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<User>()
                 .HasIndex(u => u.Username)
@@ -26,6 +25,8 @@ namespace TestTask.Data
                 .WithMany()
                 .HasForeignKey(t => t.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
+            
+            base.OnModelCreating(modelBuilder);
         }
     }
 }
