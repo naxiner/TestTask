@@ -25,6 +25,7 @@ namespace TestTask.Controllers
             _logger = logger;
         }
         
+        // Get token from claims
         private Guid GetUserIdFromToken()
         {
             var test = User.Claims;

@@ -87,6 +87,7 @@ namespace TestTask.Controllers
             return Ok(token);
         }
 
+        // Check password validity
         private bool IsPasswordComplex(string password)
         {
             // minimal length

@@ -36,21 +36,25 @@ namespace TestTask.Repositories
 
             query = query.Where(t => t.UserId == userId);
 
+            // Filter for Status
             if (filter.Status.HasValue)
             {
                 query = query.Where(t => t.Status == filter.Status.Value);
             }
-
+            
+            // Filter for DueDate
             if (filter.DueDate.HasValue)
             {
                 query = query.Where(t => t.DueDate.HasValue && t.DueDate.Value.Date == filter.DueDate.Value.Date);
             }
 
+            // Filter for Priority
             if (filter.Priority.HasValue)
             {
                 query = query.Where(t => t.Priority == filter.Priority.Value);
             }
 
+            // Sort by duedate or priority
             if (!string.IsNullOrEmpty(filter.SortBy))
             {
                 query = filter.SortBy.ToLower() switch
