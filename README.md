@@ -146,7 +146,7 @@ To retrieve a list of tasks for the authenticated user, with optional filters (e
 ### Retrieve task by id
 
 - **URL:** `/api/Task/{id}`
-- Method:** `GET`
+- **Method:** `GET`
 - **Request parameters:** 
 
 	- `id`: "guid"
@@ -170,7 +170,7 @@ To retrieve a list of tasks for the authenticated user, with optional filters (e
 ### Update task by id
 
 - **URL:** `/api/Task/{id}`
-- Method:** `PUT`
+- **Method:** `PUT`
 - **Request parameters:** 
 
 	- `id`: "guid"
@@ -198,7 +198,7 @@ To retrieve a list of tasks for the authenticated user, with optional filters (e
 ### Delete task by id
 
 - **URL:** `/api/Task/{id}`
-- Method:** `DELETE`
+- **Method:** `DELETE`
 - **Request parameters:** 
 
 	- `id`: "guid"
